@@ -1,5 +1,5 @@
 # The olypics: With a focuss on athletics
-pacman::p_load(dplyr, reticulate)
+pacman::p_load(dplyr, reticulate, ggplot2)
 
 # Scraope Tokyo 2020 data using Python
 use_python("/usr/local/bin/python")
@@ -13,4 +13,8 @@ olympics <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/t
   filter(!duplicated(total)) %>% 
   ungroup() %>% 
   select(team, total, year) %>% 
-  bind_rows(tokyo_2020)
+  bind_rows(tokyo_2020) 
+
+p <- ggplot(olympics %>% filter(year > 1960), aes(x = year, y = total,  group = team)) + geom_line() +
+  theme_bw()
+
