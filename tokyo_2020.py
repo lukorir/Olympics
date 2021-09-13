@@ -4,25 +4,56 @@
 from selenium import webdriver
 from bs4 import BeautifulSoup
 import pandas as pd
+from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+pd.set_option('display.max_columns', None)
 
-url = 'https://olympics.com/tokyo-2020/olympic-games/en/results/athletics/medal-standings.htm'
+url = 'https://olympics.com/tokyo-2020/olympic-games/en/results/all-sports/athletes.htm'
 
-#Initialize storage
+chrome_options = Options()
+chrome_options.add_argument("--headless")
+driver = webdriver.Chrome(options=chrome_options)
 data_tab = []
-driver = webdriver.Chrome()
-page_source = driver.get(url)
+
+# Open url
+driver.get(url)
+
+# Accept coockie popup
+accept_button = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='onetrust-accept-btn-handler']")))
+accept_button.click()
+
+# Scrape first page of the site
 html_source = driver.page_source
 soup = BeautifulSoup(html_source, "html.parser")
-table_tag=soup.select("table")[0]
-tab_data=[[item.text for item in row_data.select("tr,td")]
-          for row_data in table_tag.select("tr")]
-tab_data = tab_data[1:]
+table_tag = soup.select("table")[0]
+tab_data = [[item.text for item in row_data.select("tr,td")]
+            for row_data in table_tag.select("tr")]
 
-data_tab = []
 for i in tab_data:
     j = [x.strip() for x in i]
     data_tab.append(j)
-tokyo_2020 = pd.DataFrame(data_tab, columns = ["rank", "team", "Gold", "Silver", "Bronze", "total", "Rank_total", "Country"])
-tokyo_2020 = tokyo_2020.drop(['rank', 'Gold', "Silver", "Bronze", "Rank_total", "Country"], axis = 1)
-tokyo_2020['year'] = 2020
-tokyo_2020["total"] = tokyo_2020["total"].astype(str).astype(int)
+
+# Scrape subsequent pages
+while True:
+    try:
+        py_b = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='entries-table_next']/a")))
+        py_b.click()
+        html_source = driver.page_source
+        soup = BeautifulSoup(html_source, "html.parser")
+        table_tag = soup.select("table")[0]
+        tab_data = [[item.text for item in row_data.select("tr,td")]
+                    for row_data in table_tag.select("tr")]
+        for i in tab_data:
+            j = [x.strip() for x in i]
+            data_tab.append(j)
+    except: break
+ 
+tokyo_2020 = pd.DataFrame(data_tab, columns = ["name", "team", "sport"])
+tokyo_2020['year'] = int(2020)
+driver.quit()
+
+#tokyo_2020.to_csv('tokyo_2020.csv')
+
