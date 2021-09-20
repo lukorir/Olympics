@@ -1,17 +1,24 @@
-# The olypics: With a focuss on athletics
+# The olympics: With a focuss on summer olympics between 1960-2020
+# Author Luke Korir
+# Date: September 2021
+
+# Load packages _  _ _ _ _ _ _ _ _  _ _ _ _ _ _ _ _  _ _ _ _ _ _ _ _  _ _ _ _ _ _ _ 
 pacman::p_load(dplyr, reticulate, ggplot2, tidyr, ggh4x, scales, gridExtra)
 options(scipen=999)
-# Scraope Tokyo 2020 data using Python
+
+# Load python script to webscrape Tokyo 2020 data _  _ _ _ _ _ _ _ _  _ _ _ _
 use_python("/usr/local/bin/python")
 source_python('tokyo_2020.py')
 
-# Clear unnecessary variables
+# Clear unnecessary variables 
 rm(list = setdiff(ls(), "tokyo_2020"))
-# Data
+
+# Load data from Kaggle  
 olympics <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-07-27/olympics.csv') %>%
   filter(season == "Summer") %>%
   select(name, team, sport, year)
-  
+
+# Process data and merge the 2 datasets _  _ _ _ _ _ _ _ _  _ _ _ _ _ _ _ _  _  
 tokyo_2020 <- tokyo_2020 %>% select(name, team, sport, year) %>%
   separate(team, c("team", "team_b"), sep = "([;])") %>% 
   separate(sport, c("sport", "sport_b"), sep = "([;])") %>% 
@@ -45,7 +52,7 @@ plot_bar_char <- function(df, var1){
           plot.caption.position =  "plot") 
   } 
 
-# Bar plot of teams competing
+# Bar plot of teams competing 
 countries_competing <-tokyo_2020 %>% 
   select(-c(sport, name)) %>%
   plot_bar_char(team) +
@@ -53,7 +60,7 @@ countries_competing <-tokyo_2020 %>%
   scale_x_continuous(limits = c(1956, 2024), breaks = seq(1960, 2020, by = 4), labels = c("1960", "", "", "", "", "1980", "", "", "", "", "2000", "", "", "", "", "2020*")) +
   scale_y_continuous(limits = c(0, 300), breaks = seq(0,300, by = 50), position = 'right', expand = c(0,0)) +
   geom_hline(yintercept = 0, color = "black", size = 2) +
-  theme(axis.ticks.length.x = unit(0.25, "cm")) +
+  #theme(axis.ticks.length.x = unit(0.25, "cm")) +
   labs(title = "Sports over the years",
        subtitle = "The Summer Olympic Games\n \n—\nCountries competing",
        caption = "Source: 1960-2016-Kaggle; 2020-olympics.com\n \n@lukorir")
@@ -67,7 +74,7 @@ athletes_competing <- tokyo_2020 %>%
   scale_y_continuous(limits = c(0, 12000), breaks = seq(0,12000, by = 2000), position = 'right', expand = c(0,0),
                      labels = label_number(suffix = "", scale = 1e-3, accuracy = 1)) +
   geom_hline(yintercept = 0, color = "black", size = 2) +
-  theme(axis.ticks.length.x = unit(0.25, "cm")) +
+  #theme(axis.ticks.length.x = unit(0.25, "cm")) +
   labs(title = "",
        subtitle = " \n \n—\nAthletes competing '000",
        caption = "† Includes IOC refugee team\n \n")
@@ -80,10 +87,11 @@ number_sports <- tokyo_2020 %>%
   scale_x_continuous(limits = c(1956, 2024), breaks = seq(1960, 2020, by = 4), labels = c("1960", "", "", "", "", "1980", "", "", "", "", "2000", "", "", "", "", "2020")) +
   scale_y_continuous(limits = c(0, 50), breaks = seq(0,50, by = 10), position = 'right', expand = c(0,0)) +
   geom_hline(yintercept = 0, color = "black", size = 2) +
-  theme(axis.ticks.length.x = unit(0.25, "cm")) +
+  #theme(axis.ticks.length.x = unit(0.25, "cm")) +
   labs(title = "",
        subtitle = " \n \n—\nNumber of sports",
        caption = "* Held in 2021\n \n")
 
 # Combine the plots
 grid.arrange(countries_competing, athletes_competing, number_sports, nrow = 1)
+#  _ _ _ _ _ _ _ _ _ _ _ _ _ _ _  END _ _ _ _ _ _ _ _ _ _ _ _ _
