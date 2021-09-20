@@ -33,8 +33,9 @@ tab_data = [[item.text for item in row_data.select("tr,td")]
             for row_data in table_tag.select("tr")]
 
 for i in tab_data:
-    j = [x.strip() for x in i]
-    data_tab.append(j)
+    if len(i) != 0:
+        j = [x.strip() for x in i]
+        data_tab.append(j)
 
 # Scrape subsequent pages
 while True:
@@ -47,8 +48,9 @@ while True:
         tab_data = [[item.text for item in row_data.select("tr,td")]
                     for row_data in table_tag.select("tr")]
         for i in tab_data:
-            j = [x.strip() for x in i]
-            data_tab.append(j)
+            if len(i) != 0:
+                j = [x.strip() for x in i]
+                data_tab.append(j)
     except: break
  
 tokyo_2020 = pd.DataFrame(data_tab, columns = ["name", "team", "sport"])
