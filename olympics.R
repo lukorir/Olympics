@@ -4,7 +4,6 @@
 
 # Load packages _  _ _ _ _ _ _ _ _  _ _ _ _ _ _ _ _  _ _ _ _ _ _ _ _  _ _ _ _ _ _ _ 
 pacman::p_load(dplyr, reticulate, ggplot2, tidyr, ggh4x, scales, gridExtra)
-options(scipen=999)
 
 # Load python script to webscrape Tokyo 2020 data _  _ _ _ _ _ _ _ _  _ _ _ _
 use_python("/usr/local/bin/python")
@@ -36,6 +35,8 @@ plot_bar_char <- function(df, var1){
     count(year) %>% 
     ggplot(aes(y = n, x = year)) +
     theme_bw() +
+    scale_x_continuous(limits = c(1956, 2024), breaks = seq(1960, 2020, by = 4), 
+                       labels = c("1960", "", "", "", "", "1980", "", "", "", "", "2000", "", "", "", "", "2020†*")) +
     theme(panel.border = element_blank(),
           axis.title.y = element_blank(),
           axis.title.x = element_blank(),
@@ -57,7 +58,6 @@ countries_competing <-tokyo_2020 %>%
   select(-c(sport, name)) %>%
   plot_bar_char(team) +
   geom_bar(stat = "identity",  fill = '#4682B4') +
-  scale_x_continuous(limits = c(1956, 2024), breaks = seq(1960, 2020, by = 4), labels = c("1960", "", "", "", "", "1980", "", "", "", "", "2000", "", "", "", "", "2020*")) +
   scale_y_continuous(limits = c(0, 300), breaks = seq(0,300, by = 50), position = 'right', expand = c(0,0)) +
   geom_hline(yintercept = 0, color = "black", size = 2) +
   #theme(axis.ticks.length.x = unit(0.25, "cm")) +
@@ -70,7 +70,6 @@ athletes_competing <- tokyo_2020 %>%
   select(-c(sport, team)) %>%
   plot_bar_char(name) +
   geom_bar(stat = "identity",  fill = '#00CED1') +
-  scale_x_continuous(limits = c(1956, 2024), breaks = seq(1960, 2020, by = 4), labels = c("1960", "", "", "", "", "1980", "", "", "", "", "2000", "", "", "", "", "2020†")) +
   scale_y_continuous(limits = c(0, 12000), breaks = seq(0,12000, by = 2000), position = 'right', expand = c(0,0),
                      labels = label_number(suffix = "", scale = 1e-3, accuracy = 1)) +
   geom_hline(yintercept = 0, color = "black", size = 2) +
@@ -84,7 +83,6 @@ number_sports <- tokyo_2020 %>%
   select(-c(name, team)) %>%
   plot_bar_char(sport) +
   geom_bar(stat = "identity",  fill = '#66CDAA')  + 
-  scale_x_continuous(limits = c(1956, 2024), breaks = seq(1960, 2020, by = 4), labels = c("1960", "", "", "", "", "1980", "", "", "", "", "2000", "", "", "", "", "2020")) +
   scale_y_continuous(limits = c(0, 50), breaks = seq(0,50, by = 10), position = 'right', expand = c(0,0)) +
   geom_hline(yintercept = 0, color = "black", size = 2) +
   #theme(axis.ticks.length.x = unit(0.25, "cm")) +
