@@ -27,7 +27,9 @@ tokyo_2020 <- tokyo_2020 %>% select(name, team, sport, year) %>%
   mutate(team = case_when(team == "United States-1" | team == "United States-2" | team == "United States-3" ~ "United States",
                           TRUE ~ team)) 
 
-# Function to create basic bar plot  
+# Function to create basic bar plot
+rep_blank <- rep("", 4) # To be used in blank labeling of X-axis
+
 plot_bar_char <- function(df, var1){
   df %>% filter(year >= 1960) %>%
     group_by({{ var1 }}, year) %>% 
@@ -36,7 +38,7 @@ plot_bar_char <- function(df, var1){
     ggplot(aes(y = n, x = year)) +
     theme_bw() +
     scale_x_continuous(limits = c(1956, 2024), breaks = seq(1960, 2020, by = 4), 
-                       labels = c("1960", "", "", "", "", "1980", "", "", "", "", "2000", "", "", "", "", "2020†*")) +
+                       labels = c("1960", rep_blank, "1980", rep_blank, "2000", rep_blank, "2020†*")) +
     theme(panel.border = element_blank(),
           axis.title.y = element_blank(),
           axis.title.x = element_blank(),
